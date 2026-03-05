@@ -26,18 +26,18 @@ public:
         password = "";
         phoneNumber = "";
         status = "Offline";
-        lastSeen = "";
+        updateLastSeen();
     }
 
     User(string uname, string pwd, string phone) {
         // TODO: Implement parameterized constructor
         username = uname;
-        if(validPassword(pwd)){
-            password = pwd;
+        while(!validPassword(pwd)){
+            cout << "Password must be at least 6 characters" <<endl;
+            cout << "Enter password again: ";
+            cin >> pwd;
         }
-        else{
-            cout << "Password should be at least 6 Characters\n";
-        }
+        password = pwd;
         phoneNumber = phone;
         status = "Online";
         updateLastSeen();
@@ -87,12 +87,12 @@ public:
 
     void changePassword(string newPwd) {
         // TODO: Implement password change
-        if(validPassword(newPwd)){
-            password = newPwd;
+        while(!validPassword(newPwd)){
+            cout << "Password must be at least 6 characters" << endl;
+            cout << "Enter new password again: ";
+            cin >> newPwd;
         }
-        else{
-            cout << "Password should be at least 6 Characters\n";
-        }
+        password = newPwd;
     }
 };
 
