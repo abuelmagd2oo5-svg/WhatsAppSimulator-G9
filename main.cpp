@@ -15,54 +15,84 @@ private:
     string status;
     string lastSeen;
 
+    bool validPassword(string pass){
+        return pass.length() >= 6;
+    }
+
 public:
     User() {
         // TODO: Implement default constructor
+        username = "";
+        password = "";
+        phoneNumber = "";
+        status = "Offline";
+        lastSeen = "";
     }
 
     User(string uname, string pwd, string phone) {
         // TODO: Implement parameterized constructor
+        username = uname;
+        if(validPassword(pwd)){
+            password = pwd;
+        }
+        else{
+            cout << "Password should be at least 6 Characters\n";
+        }
+        phoneNumber = phone;
+        status = "Online";
+        updateLastSeen();
     }
 
     string getUsername() const {
         // TODO: Implement getter
-        return "";
+        return username;
     }
 
     string getPhoneNumber() const {
         // TODO: Implement getter
-        return "";
+        return phoneNumber;
     }
 
     string getStatus() const {
         // TODO: Implement getter
-        return "";
+        return status;
     }
 
     string getLastSeen() const {
         // TODO: Implement getter
-        return "";
+        return lastSeen;
     }
 
     void setStatus(string newStatus) {
         // TODO: Implement setter
+        status = newStatus;
     }
 
     void setPhoneNumber(string phone) {
         // TODO: Implement setter
+        phoneNumber = phone;
     }
 
     void updateLastSeen() {
         // TODO: Implement last seen update
+        time_t now = time(0);
+        char* date = ctime(&now);
+        lastSeen = string(date);
     }
 
     bool checkPassword(string pwd) const {
         // TODO: Implement password check
-        return false;
+        return (pwd == password);
     }
 
     void changePassword(string newPwd) {
         // TODO: Implement password change
+        if(validPassword(newPwd)){
+            password = newPwd;
+        }
+        else{
+            cout << "Password should be at least 6 Characters\n";
+        }
     }
 };
 
