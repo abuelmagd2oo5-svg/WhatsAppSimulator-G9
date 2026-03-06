@@ -119,6 +119,7 @@ public:
 
     }
 
+
     Message(string sndr, string cntnt) {
         // TODO: Implement parameterized constructor
         sender= sndr;
@@ -128,9 +129,11 @@ public:
         updateTimestamp();
     }
 
+
     string getContent() const {
         return content;
     }
+
 
     string getSender() const {
         return sender;
@@ -151,6 +154,7 @@ public:
     void setStatus(string newStatus) {
         status= newStatus;
     }
+
 
     void setReplyTo(Message* msg) {
         replyTo= msg;
@@ -176,6 +180,8 @@ public:
         content += " "+emojiCode;
     }
 };
+
+
 
 // ========================
 //       CHAT CLASS (BASE)
