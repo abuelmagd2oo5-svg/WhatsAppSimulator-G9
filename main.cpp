@@ -112,55 +112,207 @@ public:
         // TODO: Implement default constructor
     }
 
+
     Message(string sndr, string cntnt) {
-        // TODO: Implement parameterized constructor
+        // TODO: Implement parameterized constructor 
     }
+       //Message() : string text)(""),sender("unknow"),priorit)(0){
+       // }
+       // };
 
     string getContent() const {
         // TODO: Implement getter
         return "";
     }
 
+
+     // messade(string t,string s) : text(t), sender(s) {
+    //}
+    //}
+     {
     string getSender() const {
         // TODO: Implement getter
         return "";
     }
+//int main () {
+   // Message m2 )("hello","world");
+   // cout <<"the person who sent this is :" .getSender
+}
+
 
     string getTimestamp() const {
         // TODO: Implement getter
         return "";
     }
 
+// class Message {
+//private:
+    string sender;
+    string text;
+//    long timestamp; // Storing time as a big number (seconds)
+
+// public:
+    // Your Getter for the timestamp
+// long getTimestamp() const {return timestamp;
+// }
+// };
+
+
+
+    long getTimestamp() const {
+        return timestamp;
+    }
+};
+
+
+
+    string getStatus() const {
+        return status;
+    }
+};
+
+// class Message {
+// private:
+    string status; // Holds the status text
+
+// public:
+    // Constructor sets the starting status
+   // Message() : status("Sent") {}
+
+    // The Getter
+
+
     string getStatus() const {
         // TODO: Implement getter
         return "";
     }
+
+
+
 
     Message* getReplyTo() const {
         // TODO: Implement getter
         return nullptr;
     }
 
+//class Message {
+//private:
+//    int replyToID; // The ID of the original message
+
+// public:
+    // 1. In your Default Constructor, set it to 0 (meaning it's not a reply)
+   // Message() : replyToID(0) {}
+
+    // 2. The Getter
+  //  int getReplyTo() const {
+      //  return replyToID;
+    }
+};
+
+
+
     void setStatus(string newStatus) {
         // TODO: Implement setter
     }
 
+//int main() {
+    Message msg; // Starts as "Sent"
+    
+    // Time passes... the message is read!
+    msg.setStatus("Read"); 
+    
+    // Now if you check it:
+    cout << msg.getStatus(); // Output: Read
+}
+
+
+
     void setReplyTo(Message* msg) {
         // TODO: Implement setter
     }
+//class Message {
+//private:
+ //   int replyToID;
+
+//public:
+    // The Setter
+    
+    // 'id' is the number of the message you are replying to
+   // void setReplyTo(int id) {
+        replyToID = id;
+    }
+};
+
+
 
     void updateTimestamp() {
         // TODO: Implement timestamp update
     }
 
+//class Message {
+//private:
+ //   long timestamp;
+
+//public:
+    // The Setter to update the time
+  //  void updateTimestamp(long newTime) {
+        timestamp = newTime;
+    }
+};
+
+
+
     void display() const {
         // TODO: Implement message display
     }
+//#include <iostream>
+//using namespace std;
+
+//class Message {
+//private:
+    string sender;
+    string text;
+    string status;
+ //   long timestamp;
+  //  int replyToID;
+
+//public:
+    //void display() {
+        cout << "==========================" << endl;
+        cout << "From: " << sender << endl;
+        cout << "Message: " << text << endl;
+        cout << "Status: [" << status << "]" << endl;
+        cout << "Time: " << timestamp << endl;
+        
+        if (replyToID > 0) {
+            cout << "Replying to Message ID: #" << replyToID << endl;
+        }
+        cout << "==========================" << endl;
+    }
+};
+//
+
+
 
     void addEmoji(string emojiCode) {
         // TODO: Implement emoji support
     }
 };
+
+//
+//
+
+
+
+
+
+
+
+
+
+
+
+
 
 // ========================
 //       CHAT CLASS (BASE)
