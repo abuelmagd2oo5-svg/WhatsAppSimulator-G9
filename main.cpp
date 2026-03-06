@@ -78,6 +78,7 @@ public:
         time_t now = time(0);
         char* date = ctime(&now);
         lastSeen = string(date);
+        lastSeen.pop_back();
     }
 
     bool checkPassword(string pwd) const {
@@ -110,55 +111,69 @@ private:
 public:
     Message() {
         // TODO: Implement default constructor
+        sender="";
+        content="";
+        status="Sent";
+        replyTo =nullptr;
+        updateTimestamp();
+
     }
 
     Message(string sndr, string cntnt) {
         // TODO: Implement parameterized constructor
+        sender= sndr;
+        content= cntnt;
+        status="Sent";
+        replyTo=nullptr;
+        updateTimestamp();
     }
 
     string getContent() const {
-        // TODO: Implement getter
-        return "";
+        return content;
     }
 
     string getSender() const {
-        // TODO: Implement getter
-        return "";
+        return sender;
     }
 
     string getTimestamp() const {
-        // TODO: Implement getter
-        return "";
+        return timestamp;
     }
 
     string getStatus() const {
-        // TODO: Implement getter
-        return "";
+        return status;
     }
 
     Message* getReplyTo() const {
-        // TODO: Implement getter
-        return nullptr;
+        return replyTo;
     }
 
     void setStatus(string newStatus) {
-        // TODO: Implement setter
+        status= newStatus;
     }
 
     void setReplyTo(Message* msg) {
-        // TODO: Implement setter
+        replyTo= msg;
     }
 
     void updateTimestamp() {
-        // TODO: Implement timestamp update
+        time_t now =time(0);
+        char* date =ctime(&now);
+        timestamp = string(date);
+        timestamp.pop_back();
     }
 
     void display() const {
-        // TODO: Implement message display
+        cout << sender << " [ " << timestamp << " ] :  " << content;
+
+        if(replyTo !=nullptr){
+            cout << "\n (Reply to: "<< replyTo->getContent()<< " )";
+        }
+        cout << "\nStatus: "<< status << endl;
     }
 
     void addEmoji(string emojiCode) {
-        // TODO: Implement emoji support
+        content += " "+emojiCode;
     }
 };
 
