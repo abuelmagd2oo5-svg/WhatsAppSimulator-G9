@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <ctime>
+#include <fstream>
 using namespace std;
 
 // ========================
@@ -194,33 +195,83 @@ protected:
 
 public:
     Chat() {
-        // TODO: Implement default constructor
+       participants = {} ;
+       messages = {} ;
+       chatName = "" ;
     }
 
     Chat(vector<string> users, string name) {
-        // TODO: Implement parameterized constructor
+        participants = users ;
+        chatName = name ;
     }
 
     void addMessage(const Message& msg) {
-        // TODO: Implement message addition
+        messages.push_back(msg) ;
     }
 
     bool deleteMessage(int index, const string& username) {
-        // TODO: Implement message deletion
+        if (index < 0 || index >= messages.size())
+            return false ;
+
+        if (messages[index].getSender() == username)
+        {
+            messages.erase(messages.begin() + index) ;
+            return true ;
+        }
+
         return false;
     }
 
     virtual void displayChat() const {
-        // TODO: Implement chat display
+        cout<<"Chat Name: " << chatName << endl ;
+        cout<<"Participants: " ;
+        for (const auto& user : participants)
+        {
+            cout<< user << " " ;
+        }
+        cout << endl << "--------------------" << endl ;
+        for (const auto& msg : messages)
+        {
+            msg.display() ;
+        }
     }
 
     vector<Message> searchMessages(string keyword) const {
-        // TODO: Implement message search
-        return {};
+        vector<Message> result ;
+
+        for(const Message& msg : messages)
+        {
+            if (msg.getContent().find(keyword) != string::npos)
+            {
+                result.push_back(msg);
+            }
+
+        }
+        return result;
     }
 
     void exportToFile(const string& filename) const {
-        // TODO: Implement export to file
+    ofstream file(filename);
+
+    if(!file){
+        cout << "Error opening file!" << endl;
+        return;
+    }
+
+    file << "Chat Name: " << chatName << endl;
+    file << "Participants: ";
+
+    for(const string& user : participants){
+        file << user << " ";
+    }
+
+    file << endl << endl;
+
+    for(const Message& msg : messages){
+        file << msg.getSender() << ": " << msg.getContent() << endl;
+    }
+
+    file.close();
     }
 };
 
@@ -234,15 +285,28 @@ private:
 
 public:
     PrivateChat(string u1, string u2) {
-        // TODO: Implement constructor
+        user1 = u1 ;
+        user2 = u2 ;
+
+        participants.push_back(user1) ;
+        participants.push_back(user2) ;
+
+        chatName = "chat between " + user1 + " and " + user2 ;
     }
 
     void displayChat() const override {
-        // TODO: Implement private chat display
+        cout<< "=== private Chat ===" << endl ;
+        cout<< chatName << endl ;
+        cout<< "--------------------" << endl ;
+        for (const auto& msg : messages)
+        {
+            msg.display() ;
+        }
+        cout<< "--------------------" << endl ;
     }
 
     void showTypingIndicator(const string& username) const {
-        // TODO: Implement typing indicator
+        cout<< username << " is typing..." << endl ;
     }
 };
 
