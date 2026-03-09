@@ -331,7 +331,7 @@ public:
         // TODO: Implement constructor
         participants = users;
         chatName = name;
-//////////////////////////////////////////
+
         if(!isParticipant(creator))
         {
             participants.push_back(creator);
@@ -419,9 +419,14 @@ public:
         cout << "Group Name: " << chatName << endl;
         cout << "Description: " << description << endl;
 
-        cout << "Participants: ";
-        for(const string& user : participants)
-        {
+        cout << "\nAdmins: ";
+        for(const string& admin : admins){
+            cout << admin << " ";
+        }
+
+        cout << "\nParticipants: ";
+        for(const string& user : participants){
+            if(!isAdmin(user))
             cout << user << " ";
         }
 
@@ -431,7 +436,7 @@ public:
         {
             msg.display();
         }
-
+        cout << "--------------------\n";
     }
 
     void sendJoinRequest(const string& username)
@@ -444,6 +449,45 @@ public:
 
         cout << username << " requested to join the group." << endl;
     }
+
+
+        bool addParticipant(const string& admin, const string& newUser) {
+            if (!isAdmin(admin)) {
+                cout << "Only admins can add users.\n";
+                return false;
+            }
+
+            if (isParticipant(newUser)) {
+                cout << newUser << " is already in the group.\n";
+                return false;
+            }
+
+            participants.push_back(newUser);
+            cout << newUser << " has been added to the group.\n";
+            return true;
+        }
+
+
+        bool makeAdmin(const string& admin, const string& userToPromote) {
+            if (!isAdmin(admin)) {
+                cout << "Only admins can promote users.\n";
+                return false;
+            }
+
+            if (!isParticipant(userToPromote)) {
+                cout << "User not found in the group.\n";
+                return false;
+            }
+
+            if (isAdmin(userToPromote)) {
+                cout << userToPromote << " is already an admin.\n";
+                return false;
+            }
+
+            admins.push_back(userToPromote);
+            cout << userToPromote << " has been promoted to admin.\n";
+            return true;
+        }
 };
 
 // ========================
@@ -848,6 +892,134 @@ public:
                 cout << "No messages found containing this keyword.\n";
             }
         }
+        void showParticipants() {
+
+            if(chats.empty()){
+                cout << "No chats available.\n";
+                return;
+            }
+
+            int index;
+            cout << "Enter chat index: ";
+            cin >> index;
+
+            if(index < 0 || index >= chats.size()){
+                cout << "Invalid chat.\n";
+                return;
+            }
+
+            GroupChat* gc = dynamic_cast<GroupChat*>(chats[index]);
+
+            if(gc == nullptr){
+                cout << "This is not a group chat.\n";
+                return;
+            }
+
+            cout << "\nParticipants:\n";
+            gc->displayChat();
+        }
+
+        void showAdmins() {
+
+            if(chats.empty()){
+                cout << "No chats available.\n";
+                return;
+            }
+
+            int index;
+            cout << "Enter chat index: ";
+            cin >> index;
+
+            if(index < 0 || index >= chats.size()){
+                cout << "Invalid chat.\n";
+                return;
+            }
+
+            GroupChat* gc = dynamic_cast<GroupChat*>(chats[index]);
+
+            if(gc == nullptr){
+                cout << "This is not a group chat.\n";
+                return;
+            }
+
+            gc->displayChat();
+        }
+
+        void addUserToGroup() {
+
+            int index;
+            cout << "Enter group index: ";
+            cin >> index;
+
+            if(index < 0 || index >= chats.size()){
+                cout << "Invalid group.\n";
+                return;
+            }
+
+            GroupChat* gc = dynamic_cast<GroupChat*>(chats[index]);
+
+            if(gc == nullptr){
+                cout << "This is not a group chat.\n";
+                return;
+            }
+
+            string user;
+            cout << "Enter username to add: ";
+            cin >> user;
+
+            gc->addParticipant(getCurrentUsername(), user);
+        }
+
+        void promoteToAdmin() {
+
+            int index;
+            cout << "Enter group index: ";
+            cin >> index;
+
+            GroupChat* gc = dynamic_cast<GroupChat*>(chats[index]);
+
+            if(gc == nullptr){
+                cout << "Not a group chat.\n";
+                return;
+            }
+
+            string user;
+            cout << "Enter username: ";
+            cin >> user;
+
+            gc->makeAdmin(getCurrentUsername(), user);
+        }
+        void removeUserFromGroup() {
+
+            int index;
+            cout << "Enter group index: ";
+            cin >> index;
+
+            if(index < 0 || index >= chats.size()){
+                cout << "Invalid chat index.\n";
+                return;
+            }
+
+            GroupChat* gc = dynamic_cast<GroupChat*>(chats[index]);
+
+            if(gc == nullptr){
+                cout << "Not a group chat.\n";
+                return;
+            }
+
+            string user;
+            cout << "Enter username to remove: ";
+            cin >> user;
+
+            bool success = gc->removeParticipant(getCurrentUsername(), user);
+
+            if(success){
+                cout << user << " has been removed from the group.\n";
+            }
+            else{
+                cout << "Failed to remove user. Make sure you are an admin and the user exists.\n";
+            }
+        }
 
     void run() {
         while (true) {
@@ -863,8 +1035,19 @@ public:
             }
             else {
                     int choice;
-                cout << "\n1. Start Private Chat\n2. Create Group\n3. View Chats\n4. Send Message\n5. Reply Message\n6. Search Messages\n7. Logout\nChoice: ";
-                cin >> choice;
+cout << "\n1. Start Private Chat\n"
+     << "2. Create Group\n"
+     << "3. View Chats\n"
+     << "4. Send Message\n"
+     << "5. Reply Message\n"
+     << "6. searchInChat\n"
+     << "7. Show Participants\n"
+     << "8. Show Admins\n"
+     << "9. Add User to Group\n"
+     << "10. Promote to Admin\n"
+     << "11. Remve User from group\n"
+     << "12. Logout\nChoice: ";
+     cin >> choice;
 
                 if (choice == 1) startPrivateChat();
                 else if (choice == 2) createGroup();
@@ -872,7 +1055,12 @@ public:
                 else if (choice == 4) sendMessage();
                 else if (choice == 5) replyMessage();
                 else if (choice == 6) searchInChat();
-                else if (choice == 7) logout();
+                else if (choice == 7) showParticipants();
+                else if (choice == 8) showAdmins();
+                else if (choice == 9) addUserToGroup();
+                else if (choice == 10) promoteToAdmin();
+                else if (choice == 11) removeUserFromGroup();
+                else if (choice == 12) logout();
             }
         }
     }
