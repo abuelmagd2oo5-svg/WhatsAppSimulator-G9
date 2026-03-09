@@ -320,50 +320,54 @@ private:
 
 public:
     GroupChat(vector<string> users, string name, string creator) {
-      
-        // TODO: Implement constructor 
+
+        // TODO: Implement constructor
         participants = users;
         chatName = name;
+
+        if(!isParticipant(creator))
+        {
         participants.push_back(creator);
+        }
         admins.push_back(creator);
     }
 
     void addAdmin(string newAdmin)
     {
         // TODO: Implement add admin
-        
-        for (int i = 0; i < participants.size(); i++)
+
+        if(isParticipant(newAdmin) && !isAdmin(newAdmin))
         {
-            if (participants[i] == newAdmin && !isAdmin(newAdmin))
-            {
-                admins.push_back(newAdmin);
-            break; 
-            }
-           
+            admins.push_back(newAdmin);
         }
-      
+
     }
 
     bool removeParticipant(const string& admin, const string& userToRemove) {
         // TODO: Implement remove participant
-         for (int i = 0; i < admins.size (); i++)
-        { 
-             if (admins[i] == admin)
-             {
-                 for (int j = 0; j < participants.size(); j++)
-                 {
-                     if (participants[j] == userToRemove)
-                     {
-                         participants.erase(participants.begin() + j);
-                         return true;
-                     }
+        if(!isAdmin(admin))
+            return false;
 
-                 }
-              return false;
-             }
-         
+        for(int i = 0; i < participants.size(); i++)
+        {
+            if(participants[i] == userToRemove)
+            {
+                participants.erase(participants.begin() + i);
+
+                for(int j = 0; j < admins.size(); j++)
+                {
+                    if(admins[j] == userToRemove)
+                    {
+                        admins.erase(admins.begin() + j);
+                        break;
+                    }
+                }
+
+                return true;
+            }
         }
-          return false;
+
+        return false;
     }
 
     bool isAdmin(string username) const
@@ -376,7 +380,7 @@ public:
                 return true;
 
             }
-      
+
         }
         return false;
     }
@@ -403,17 +407,30 @@ public:
 
     void displayChat() const override {
         // TODO: Implement group chat display
-        for (int i = 0; i < messages.size(); i++)
+
+        cout << "=== Group Chat ===" << endl;
+        cout << "Group Name: " << chatName << endl;
+        cout << "Description: " << description << endl;
+
+        cout << "Participants: ";
+        for(const string& user : participants)
         {
-            cout << messages[i] <<  endl ;
+            cout << user << " ";
         }
-            
+
+        cout << endl << "--------------------" << endl;
+
+        for (const Message& msg : messages)
+        {
+            msg.display();
+        }
+
     }
 
     void sendJoinRequest(const string& username)
     {
         // TODO: Implement join request
- 
+
         cout << username << " requested to join the group." << endl;
     }
 };
