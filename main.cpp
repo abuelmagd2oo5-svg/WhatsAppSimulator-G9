@@ -210,7 +210,7 @@ public:
     }
 
     bool deleteMessage(int index, const string& username) {
-        if (index < 0 || index >= messages.size())
+        if (index < 0 || index >= (int) messages.size())
             return false ;
 
         if (messages[index].getSender() == username)
@@ -222,7 +222,7 @@ public:
         return false;
     }
 
-    virtual void displayChat() const {
+     virtual void displayChat() const {
         cout<<"Chat Name: " << chatName << endl ;
         cout<<"Participants: " ;
         for (const auto& user : participants)
@@ -273,6 +273,10 @@ public:
 
     file.close();
     }
+
+    vector<Message>& getMessages() {
+    return messages;
+}
 };
 
 // ========================
@@ -293,6 +297,9 @@ public:
 
         chatName = "chat between " + user1 + " and " + user2 ;
     }
+
+    string getUser1() const { return user1; }
+    string getUser2() const { return user2; }
 
     void displayChat() const override {
         cout<< "=== private Chat ===" << endl ;
@@ -324,10 +331,10 @@ public:
         // TODO: Implement constructor
         participants = users;
         chatName = name;
-
+//////////////////////////////////////////
         if(!isParticipant(creator))
         {
-        participants.push_back(creator);
+            participants.push_back(creator);
         }
         admins.push_back(creator);
     }
@@ -430,6 +437,10 @@ public:
     void sendJoinRequest(const string& username)
     {
         // TODO: Implement join request
+        if(isParticipant(username)){
+            cout << username << " is already in the group.\n";
+            return;
+        }
 
         cout << username << " requested to join the group." << endl;
     }
@@ -528,6 +539,11 @@ public:
         cout << "Enter username to chat with: ";
         cin >> otherUser;
 
+        if(otherUser == getCurrentUsername()){
+            cout << "You cannot chat with yourself.\n";
+            return;
+        }
+
         if(findUserIndex(otherUser) == -1){
             cout << "User not found.\n";
             return;
@@ -535,12 +551,29 @@ public:
 
         string currentUser = getCurrentUsername();
 
+        string chatName1 = "chat between " + currentUser + " and " + otherUser;
+        string chatName2 = "chat between " + otherUser + " and " + currentUser;
+
+
+        for(Chat* chat : chats){
+            PrivateChat* pc = dynamic_cast<PrivateChat*>(chat);
+            if(pc != nullptr){
+                if((pc->getUser1() == currentUser && pc->getUser2() == otherUser) ||
+                    (pc->getUser1() == otherUser && pc->getUser2() == currentUser)){
+                    cout << "Private chat already exists.\n";
+                    return;
+                }
+            }
+        }
+
+
         Chat* chat = new PrivateChat(currentUser, otherUser);
 
         chats.push_back(chat);
 
         cout << "Private chat created successfully.\n";
     }
+
 
     void createGroup() {
         // TODO: Implement group creation
@@ -552,7 +585,10 @@ public:
 
         cout << "Enter number of participants: ";
         cin >> num;
-
+        if(num < 2){
+            cout << "Group must have at least 2 participants.\n";
+            return;
+        }
         vector<string> members;
 
         for(int i = 0; i < num; i++){
@@ -561,13 +597,30 @@ public:
             cout << "Enter username: ";
             cin >> user;
 
-            if(findUserIndex(user) != -1){
-                members.push_back(user);
+            if(findUserIndex(user) == -1){
+                cout << "User not found. try again\n";
+                i--;
+                continue;
             }
-            else{
-                cout << "User not found.\n";
+
+            bool exists = false;
+
+            for(const string& m : members){
+                if(m == user){
+                    exists = true;
+                    break;
+                }
             }
+
+            if(exists){
+                cout << "User already added to the group.\n";
+                i--;
+                continue;
+            }
+
+            members.push_back(user);
         }
+
 
         string creator = getCurrentUsername();
 
@@ -578,18 +631,38 @@ public:
         cout << "Group created successfully.\n";
     }
 
+
     void viewChats() const {
-        // TODO: Implement chat viewing
         if(chats.empty()){
             cout << "No chats available.\n";
             return;
         }
 
+        string currentUser = getCurrentUsername();
+        int counter = 1;
+
         for(int i = 0; i < chats.size(); i++){
-            cout << "\nChat " << i + 1 << endl;
-            chats[i]->displayChat();
+            Chat* chat = chats[i];
+
+            PrivateChat* pc = dynamic_cast<PrivateChat*>(chat);
+            if(pc != nullptr){
+                if(pc->getUser1() == currentUser || pc->getUser2() == currentUser){
+                    cout << "\nChat " << counter++ << endl;
+                    chat->displayChat();
+            }
+            continue;
+        }
+
+        GroupChat* gc = dynamic_cast<GroupChat*>(chat);
+        if(gc != nullptr){
+            if(gc->isParticipant(currentUser)){
+                cout << "\nChat " << counter++ << endl;
+                chat->displayChat();
+            }
         }
     }
+}
+
 
     void logout() {
         // TODO: Implement logout
@@ -603,8 +676,182 @@ public:
         cout << "Logged out successfully.\n";
     }
 
+    void sendMessage() {
+
+        if(chats.empty()){
+            cout << "No chats available.\n";
+            return;
+        }
+
+        string currentUser = getCurrentUsername();
+
+        vector<int> availableChats;
+        int counter = 1;
+
+        cout << "\nYour Chats:\n";
+
+        for(int i = 0; i < chats.size(); i++){
+
+            PrivateChat* pc = dynamic_cast<PrivateChat*>(chats[i]);
+            if(pc != nullptr){
+                if(pc->getUser1() == currentUser || pc->getUser2() == currentUser){
+                    cout << counter << ". ";
+                    chats[i]->displayChat();
+                    availableChats.push_back(i);
+                    counter++;
+                }
+                continue;
+            }
+
+            GroupChat* gc = dynamic_cast<GroupChat*>(chats[i]);
+            if(gc != nullptr){
+                if(gc->isParticipant(currentUser)){
+                    cout << counter << ". ";
+                    chats[i]->displayChat();
+                    availableChats.push_back(i);
+                    counter++;
+                }
+            }
+        }
+
+        if(availableChats.empty()){
+            cout << "You are not part of any chats.\n";
+            return;
+        }
+
+        int choice;
+        cout << "\nSelect chat number: ";
+        cin >> choice;
+
+        if(choice < 1 || choice > availableChats.size()){
+            cout << "Invalid choice.\n";
+            return;
+        }
+
+        cin.ignore();
+
+        string text;
+        cout << "Enter message: ";
+        getline(cin, text);
+
+        Message msg(currentUser, text);
+
+        chats[availableChats[choice-1]]->addMessage(msg);
+
+        cout << "Message sent successfully.\n";
+    }
+
+    void replyMessage() {
+
+        string currentUser = getCurrentUsername();
+
+        if(chats.empty()){
+            cout << "No chats available.\n";
+            return;
+        }
+
+        int chatIndex;
+
+        cout << "Select chat index: ";
+        cin >> chatIndex;
+
+        if(chatIndex < 0 || chatIndex >= chats.size()){
+            cout << "Invalid chat.\n";
+            return;
+        }
+
+        Chat* chat = chats[chatIndex];
+
+        vector<Message>& msgs = chat->getMessages();
+
+        if(msgs.empty()){
+            cout << "No messages to reply to.\n";
+            return;
+        }
+
+        cout << "\nMessages:\n";
+        for(int i = 0; i < msgs.size(); i++){
+            cout << i << ". ";
+            msgs[i].display();
+        }
+
+        int msgIndex;
+        cout << "Choose message to reply to: ";
+        cin >> msgIndex;
+
+        if(msgIndex < 0 || msgIndex >= msgs.size()){
+            cout << "Invalid message.\n";
+            return;
+        }
+
+        cin.ignore();
+
+        string text;
+        cout << "Enter your reply: ";
+        getline(cin, text);
+
+        Message reply(currentUser, text);
+
+        reply.setReplyTo(&msgs[msgIndex]);
+
+        chat->addMessage(reply);
+
+        cout << "Reply sent.\n";
+}
+        void searchInChat() {
+
+            if(chats.empty()){
+                cout << "No chats available.\n";
+                return;
+            }
+
+            string currentUser = getCurrentUsername();
+
+            cout << "\nEnter keyword to search: ";
+            string keyword;
+            cin >> keyword;
+
+            bool found = false;
+
+            for(Chat* chat : chats){
+
+            PrivateChat* pc = dynamic_cast<PrivateChat*>(chat);
+                if(pc && (pc->getUser1() == currentUser || pc->getUser2() == currentUser)){
+
+                    vector<Message> results = chat->searchMessages(keyword);
+
+                    if(!results.empty()){
+                        cout << "\nMessages found in chat:\n";
+                        for(const Message& m : results){
+                            m.display();
+                        }
+                        found = true;
+                    }
+                }
+
+                GroupChat* gc = dynamic_cast<GroupChat*>(chat);
+                if(gc && gc->isParticipant(currentUser)){
+
+                    vector<Message> results = chat->searchMessages(keyword);
+
+                    if(!results.empty()){
+                        cout << "\nMessages found in group:\n";
+                        for(const Message& m : results){
+                            m.display();
+                        }
+                        found = true;
+                    }
+                }
+            }
+
+            if(!found){
+                cout << "No messages found containing this keyword.\n";
+            }
+        }
+
     void run() {
         while (true) {
+
             if (!isLoggedIn()) {
                 cout << "\n1. Login\n2. Sign Up\n3. Exit\nChoice: ";
                 int choice;
@@ -615,14 +862,17 @@ public:
                 else if (choice == 3) break;
             }
             else {
-                cout << "\n1. Start Private Chat\n2. Create Group\n3. View Chats\n4. Logout\nChoice: ";
-                int choice;
+                    int choice;
+                cout << "\n1. Start Private Chat\n2. Create Group\n3. View Chats\n4. Send Message\n5. Reply Message\n6. Search Messages\n7. Logout\nChoice: ";
                 cin >> choice;
 
                 if (choice == 1) startPrivateChat();
                 else if (choice == 2) createGroup();
                 else if (choice == 3) viewChats();
-                else if (choice == 4) logout();
+                else if (choice == 4) sendMessage();
+                else if (choice == 5) replyMessage();
+                else if (choice == 6) searchInChat();
+                else if (choice == 7) logout();
             }
         }
     }
